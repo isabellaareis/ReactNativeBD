@@ -26,25 +26,37 @@ export default function Index(){
         }
     }//fim do listar
 
-    async function datails(item:ClienteDataBase){
+    async function details(item:ClienteDataBase){
         setId(String(item.id))
         setNome(item.nome)
         setTelefone(item.telefone)
         setEndereco(item.endereco)
     }
+
+    async function remove(id:number){
+        try{
+            await ClienteDataBase.remove(id)
+            await list()
+        }catch(error){
+            console.log(error)
+        }
+    }//fim da função remover
  
     //carregar a lista do banco
     useEffect(() => {list()},[busca])
     return (
         <View style={styles.container}>
             <Campo placeholder="Pesquisar" onChangeText={setBusca} />
-            <FlatList
-                data = {cliente}
-                keyExtractor={(item)=>String(item.id)}
-                renderItem ={({item}) => <Cliente data={item}/>}
-                contentContainerStyle={{gap:16}}
-            />
-            <Button style={styles.botao} title="Voltar" onPress={() => navigation.navigate('Index')}/>
+            <View style={styles.flat}>
+                <FlatList
+                    data = {cliente}
+                    keyExtractor={(item)=>String(item.id)}
+                    renderItem ={({item}) => <Cliente data={item} onDelete={() => remove(item.id)} onEditar={() => navigation.navigate('Atualizar', {item})}/>}
+                    contentContainerStyle={{gap:16}}
+                />
+            </View>
+           
+            <Button title="Voltar" onPress={() => navigation.navigate('Index')}/>
         </View>
     );
 }  
@@ -56,7 +68,16 @@ const styles = StyleSheet.create({
             justifyContent: 'center',
             backgroundColor: '#898989',
             alignItems: "center",
+            marginTop: 25,
         },
+
+        flat: {
+            width: '100%',
+            height: '50%',
+            padding: 10,
+            backgroundColor: '#fff',
+        },
+
 
     }
 );

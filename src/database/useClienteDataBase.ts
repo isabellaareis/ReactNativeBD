@@ -42,7 +42,34 @@ export function useClienteDataBase() {
         }
     }//fim do consultar
 
-    return { create, consultar }//retorna o create
+    async function remove(id:number){
+        try{
+            await dataBase.execAsync("Delete from pessoa where id = " + id)//deleta o registro do banco
+        }catch(error){
+            throw(error)
+        }
+    }//fim do remover
+
+    async function atualizar(data: ClienteDataBase){
+        const statement = await dataBase.prepareAsync(
+            "UPDATE pessoa SET nome = $nome, telefone = $telefone, endereco = $endereco WHERE id = $id"
+        )
+        try{
+            await statement.executeAsync({
+                $id: data.id,
+                $nome: data.nome,
+                $telefone: data.telefone,
+                $endereco: data.endereco
+            })//executa o comando SQL
+        }catch(error){
+            throw error
+        }finally{
+            await statement.finalizeAsync()
+        }//finaliza o processo
+        
+    }//fim atualizar
+
+    return { create, consultar, remove, atualizar}//retorna o create
 
 
 }//fim da função
